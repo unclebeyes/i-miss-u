@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music Player</title>
+  <style>
+    * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-image: url("teknologi2.jpg");
+  background-size: cover;
+}
+
+.music-player {
+  width: 300px;
+  background-image:url("teknologi\ 6.jpg");
+  background-size: cover;
+  background-position: center;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  padding: 20px;
+  color: #fff; /* Sesuaikan warna teks agar lebih terbaca */
+}
+
+.cover {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.cover img {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%; /* Membuat gambar menjadi lingkaran */
+  animation: rotate 5s linear infinite; /* Animasi berputar */
+  transition: transform 0.3s ease;
+}
+
+/* Memberikan animasi berputar */
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Hentikan animasi saat lagu dijeda */
+.cover.paused img {
+  animation-play-state: paused;
+}
+
+
+
+
+.info h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.info h3 {
+  font-size: 16px;
+  color: #f7f3f3;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+}
+
+.btn {
+  font-size: 24px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.progress-container {
+  width: 100%;
+  height: 5px;
+  background: #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.progress {
+  width: 0%;
+  height: 100%;
+  background: #4b6cb7;
+  border-radius: 5px;
+}
+.time {
+  display: flex;
+  justify-content:end;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #faf0f0;
+}
+
+
+  </style>
+</head>
+<body>
+    
+  <div class="music-player">
+    <div class="cover">
+      
+      <img src="cover.jpg" alt="Album Cover" id="cover">
+      
+    </div>
+    <div class="info">
+      <h2 id="title">Song Title</h2>
+      <h3 id="artist">Artist Name</h3>
+    </div>
+    <div class="controls">
+      <button id="prev" class="btn">⏮️</button>
+      <button id="play" class="btn">▶️</button>
+      <button id="next" class="btn">⏭️</button>
+    </div>
+    <div class="progress-container" id="progress-container">
+      <div class="progress" id="progress"></div>
+    </div>
+    <div class="time">
+        <span id="current-time">0:00</span> / <span id="duration">0:00</span>
+      </div>
+  </div>
+  <audio id="audio" src="song.mp4"></audio>
+  
+  
+  <script>
+    const audio = document.getElementById('audio');
+const playBtn = document.getElementById('play');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+const progressContainer = document.getElementById('progress-container');
+const progress = document.getElementById('progress');
+const title = document.getElementById('title');
+const artist = document.getElementById('artist');
+const cover = document.getElementById('cover');
+
+const songs = [
+  {
+    name: 'song1',
+    title: 'Song Title 1',
+    artist: 'Artist 1',
+    cover: 'cover1.jpg'
+  },
+  {
+    name: 'song2',
+    title: 'Song Title 2',
+    artist: 'Artist 2',
+    cover: 'cover2.jpg'
+  },
+  {
+    name: 'song3',
+    title: 'Song Title 3',
+    artist: 'Artist 3',
+    cover: 'cover3.jpg'
+  },
+  {
+    name: 'song4',
+    title: 'Song Title 4',
+    artist: 'Artist 4',
+    cover: 'cover4.jpg'
+  },
+  {
+    name: 'song5',
+    title: 'Song Title 5',
+    artist: 'Artist 5',
+    cover: 'cover5.jpg'
+  }
+];
+
+let songIndex = 0;
+
+function loadSong(song) {
+  title.innerText = song.title;
+  artist.innerText = song.artist;
+  audio.src = `${song.name}.mp4`;
+  cover.src = song.cover;
+}
+
+const coverContainer = document.querySelector('.cover');
+
+function playSong() {
+  audio.play();
+  playBtn.innerText = '⏸️';
+  coverContainer.classList.remove('paused'); // Mulai animasi berputar
+}
+
+function pauseSong() {
+  audio.pause();
+  playBtn.innerText = '▶️';
+  coverContainer.classList.add('paused'); // Hentikan animasi berputar
+}
+
+
+function nextSong() {
+  songIndex = (songIndex + 1) % songs.length;
+  loadSong(songs[songIndex]);
+  playSong();
+}
+
+function prevSong() {
+  songIndex = (songIndex - 1 + songs.length) % songs.length;
+  loadSong(songs[songIndex]);
+  playSong();
+}
+
+playBtn.addEventListener('click', () => {
+  const isPlaying = playBtn.innerText === '⏸️';
+  if (isPlaying) {
+    pauseSong();
+  } else {
+    playSong();
+  }
+});
+
+prevBtn.addEventListener('click', prevSong);
+nextBtn.addEventListener('click', nextSong);
+
+audio.addEventListener('timeupdate', updateProgress);
+progressContainer.addEventListener('click', setProgress);
+
+function updateProgress() {
+  const { duration, currentTime } = audio;
+  const progressPercent = (currentTime / duration) * 100;
+  progress.style.width = `${progressPercent}%`;
+}
+
+function setProgress(e) {
+  const width = progressContainer.clientWidth;
+  const clickX = e.offsetX;
+  const duration = audio.duration;
+  audio.currentTime = (clickX / width) * duration;
+}
+
+loadSong(songs[songIndex]);
+const currentTimeEl = document.getElementById('current-time');
+const durationEl = document.getElementById('duration');
+
+audio.addEventListener('loadedmetadata', updateDuration);  // Menampilkan durasi total saat audio siap
+audio.addEventListener('timeupdate', updateProgress);       // Memperbarui waktu berjalan saat audio diputar
+
+function updateDuration() {
+  const duration = audio.duration;
+  const minutes = Math.floor(duration / 60);
+  const seconds = Math.floor(duration % 60);
+  durationEl.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+}
+
+function updateProgress() {
+  const { currentTime, duration } = audio;
+
+  // Update progress bar
+  const progressPercent = (currentTime / duration) * 100;
+  progress.style.width = `${progressPercent}%`;
+
+  // Update current time
+  const currentMinutes = Math.floor(currentTime / 60);
+  const currentSeconds = Math.floor(currentTime % 60);
+  currentTimeEl.innerText = `${currentMinutes}:${currentSeconds < 10 ? '0' : ''}${currentSeconds}`;
+}
+
+  </script>
+</body>
+</html>
